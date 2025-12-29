@@ -1,57 +1,81 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Panel de Control de Flota</h2>
-    
-    <form action="/admin/upload" method="post" enctype="multipart/form-data" class="d-flex gap-2">
-        <input type="file" name="file" class="form-control" accept=".xlsx" required>
-        <button type="submit" class="btn btn-primary">Subir Excel</button>
-    </form>
+<div class="content-card text-center pt-4 pb-3">
+    <h2 class="page-title">PANEL DE FLOTA</h2>
+    <p class="page-subtitle">MUNICIPALIDAD DE FLORENCIO VARELA</p>
+
+    <div class="row g-3 mt-4 mb-2 px-4 justify-content-center">
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Unidades</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number text-success">{{ stats.activos }}</div>
+                <div class="stat-label">Activos</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number text-danger">{{ stats.inactivos }}</div>
+                <div class="stat-label">Inactivos</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="stat-card">
+                <div class="stat-number">{{ stats.oper }}%</div>
+                <div class="stat-label">Operatividad</div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-md-3">
-        <div class="card card-stat p-3 shadow-sm">
-            <h6 class="text-muted">TOTAL UNIDADES</h6>
-            <h3>{{ stats.total }}</h3>
-        </div>
+<div class="content-card p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-custom table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th>UNIDAD</th>
+                    <th>TIPO</th>
+                    <th>MARCA/MODELO</th>
+                    <th>PATENTE</th>
+                    <th>ÁREA</th>
+                    <th>ESTADO</th>
+                    <th class="text-end pe-4">ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in unidades %}
+                <tr>
+                    <td class="fw-bold">{{ u.id }}</td>
+                    <td>{{ u.tipo }}</td>
+                    <td>{{ u.marca }} {{ u.modelo }}</td>
+                    <td class="text-uppercase">{{ u.dominio }}</td>
+                    <td>{{ u.area }}</td>
+                    <td>
+                        {% if u.estado == 'ACTIVA' %}
+                            <span class="badge-activo">ACTIVO</span>
+                        {% elif u.estado == 'INACTIVA' %}
+                            <span class="badge-inactivo">INACTIVA</span>
+                        {% else %}
+                            <span class="badge-taller">{{ u.estado }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end pe-4">
+                        <a href="/ficha/{{ u.id }}" class="btn btn-action-dark" title="Ver Ficha">
+                            <i class="fas fa-file-alt me-1"></i> Ficha
+                        </a>
+                        <button class="btn btn-action-dark" title="Ver QR">
+                             <i class="fas fa-qrcode me-1"></i> QR
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div class="col-md-3">
-        <div class="card card-stat p-3 shadow-sm">
-            <h6 class="text-success">ACTIVOS</h6>
-            <h3>{{ stats.activos }}</h3>
-        </div>
-    </div>
-    </div>
-
-<table class="table table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Marca/Modelo</th>
-            <th>Dominio</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for u in unidades %}
-        <tr>
-            <td>{{ u.id }}</td>
-            <td>{{ u.marca }} {{ u.modelo }}</td>
-            <td>{{ u.dominio }}</td>
-            <td>
-                <span class="badge {% if u.estado=='ACTIVA' %}bg-success{% else %}bg-danger{% endif %}">
-                    {{ u.estado }}
-                </span>
-            </td>
-            <td>
-                <a href="/ficha/{{ u.id }}" class="btn btn-sm btn-outline-primary">Ficha</a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+</div>
 {% endblock %}

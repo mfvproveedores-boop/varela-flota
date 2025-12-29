@@ -4,18 +4,72 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, f
 from database import db
 from models import Unidad
 
-# NOTA: Ya no necesitamos google_creds ni gspread
-
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'clave_super_secreta_varela')
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'varela_secreta_2025')
+
+# FIX para la URL de Render/Postgres
 db_url = os.environ.get('DATABASE_URL')
 if db_url and db_url.startswith("postgres://"):
     db_url = db_url.replace("postgres://", "postgresql://", 1)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = db_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+# --- SINCRONIZACIÓN MEDIANTE CSV PÚBLICO ---
+@app.route('/admin/sync')
+def sync_csv():
+    csv_url = os.environ.get('SHEET_CSV_URL')
+    if not csv_url:
+        return "Error: No se configuró la variable SHEET_CSV_URL en Render", 500
+
+    try:
+        # Leemos el CSV directamente desde el link de Google
+        # Usamos storage_options para evitar bloqueos de user-agent si fuera necesario
+        df = pd.read_csv(csv_url, dtype=str).fillna("")
+
+        # Limpiamos la base de datos actual
+        db.session.query(Unidad).delete()
+
+        # Columnas fijas obligatorias
+        fixed_keys = ['ID', 'TIPO', 'MARCA', 'MODELO', 'DOMINIO', 'AÑO', 'ESTADO', 
+                      'FOTO_URL', 'AREA', 'MOTOR', 'CHASIS', 'PATRIMONIO', 
+                      'CHOFER', 'LEGAJO', 'DNI', 'FECHA_ALTA', 'NFC_KEY']
+
+        for _, row in df.iterrows():
+            data = row.to_dict()
+            
+            # REGLA DE ORO: Todo lo que no esté en fixed_keys va al JSONB
+            detalles_dinamicos = {k: v for k, v in data.items() if k not in fixed_keys and v != ""}
+            
+            nueva_u = Unidad(
+                id=str(data.get('ID')),
+                tipo=data.get('TIPO'),
+                marca=data.get('MARCA'),
+                modelo=data.get('MODELO'),
+                dominio=data.get('DOMINIO'),
+                anio=int(data.get('AÑO')) if str(data.get('AÑO')).isdigit() else 0,
+                estado=data.get('ESTADO'),
+                foto_url=data.get('FOTO_URL'),
+                area=data.get('AREA'),
+                motor=data.get('MOTOR'),
+                chasis=data.get('CHASIS'),
+                patrimonio=data.get('PATRIMONIO'),
+                chofer=data.get('CHOFER'),
+                legajo=data.get('LEGAJO'),
+                dni=data.get('DNI'),
+                fecha_alta=data.get('FECHA_ALTA'),
+                nfc_key=str(data.get('NFC_KEY')),
+                detalles_tecnicos=detalles_dinamicos
+            )
+            db.session.add(nueva_u)
+        
+        db.session.commit()
+        return redirect(url_for('dashboard'))
+
+    except Exception as e:
+        db.session.rollback()
+        return f"Error leyendo el CSV de Google: {str(e)}", 500
 
 # --- 1. NUEVA LÓGICA: Carga de Excel (.xlsx) ---
 @app.route('/admin/upload', methods=['POST'])
@@ -162,4 +216,5 @@ def cambiar_estado():
 if __name__ == '__main__':
 
     app.run(debug=True)
+
 

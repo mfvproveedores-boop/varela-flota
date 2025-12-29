@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card shadow">
+    <div class="card-header varela-green">
+        <h4>Ficha Técnica: {{ u.marca }} {{ u.modelo }}</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 text-center">
+                {% if u.foto_url %}
+                <img src="{{ u.foto_url }}" class="img-fluid rounded mb-3" alt="Foto Unidad">
+                {% else %}
+                <div class="alert alert-secondary">Sin Imagen</div>
+                {% endif %}
+                <h2 class="badge bg-dark fs-4">{{ u.dominio }}</h2>
+            </div>
+            <div class="col-md-8">
+                <table class="table table-striped">
+                    <tr><th>ID Interno</th><td>{{ u.id }}</td></tr>
+                    <tr><th>Área</th><td>{{ u.area }}</td></tr>
+                    <tr><th>Estado</th><td>
+                        <span class="badge {% if u.estado=='ACTIVA' %}bg-success{% else %}bg-danger{% endif %}">
+                            {{ u.estado }}
+                        </span>
+                    </td></tr>
+                    
+                    {% for key, value in u.detalles_tecnicos.items() %}
+                        <tr>
+                            <th class="text-uppercase">{{ key }}</th>
+                            <td>{{ value }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        <a href="/dashboard" class="btn btn-secondary mt-3">Volver al Dashboard</a>
+    </div>
+</div>
+{% endblock %}

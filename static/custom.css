@@ -1,0 +1,194 @@
+/* static/custom.css */
+:root {
+    --color-principal: #009B77;
+    --color-secundario: #DAA520;
+    --color-rojo: #dc3545;
+    --color-verde: #28a745;
+    --bs-body-bg: var(--color-principal); /* Fondo general verde */
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-bottom: 30px;
+}
+
+/* --- Header Estilo Banner --- */
+.main-header-container {
+    background-color: white;
+    padding: 0;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+    /* Asegúrate de que Banner.png incluya todo el encabezado como en tu foto */
+}
+
+/* --- Contenedores Principales (Tarjetas blancas) --- */
+.content-card {
+    background-color: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    margin-bottom: 30px;
+}
+
+.page-title {
+    color: var(--color-principal);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+.page-subtitle {
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 25px;
+}
+
+/* --- Dashboard Stats Cards --- */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    height: 100%;
+    transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-3px); }
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-principal);
+    line-height: 1.2;
+}
+.stat-label { color: #6c757d; font-weight: 600; }
+
+/* --- Tablas --- */
+.table-custom thead th {
+    background-color: var(--color-principal);
+    color: white;
+    border: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    padding: 12px;
+}
+.table-custom tbody tr { background-color: white; }
+.table-custom tbody tr:hover { background-color: #f8f9fa; }
+.table-custom td { vertical-align: middle; padding: 12px; }
+
+.badge-activo { color: var(--color-verde); font-weight: bold; }
+.badge-inactivo { color: var(--color-rojo); font-weight: bold; }
+.badge-taller { color: #ffc107; font-weight: bold; }
+
+/* Botones de Acción (Negros como en la imagen) */
+.btn-action-dark {
+    background-color: #212529;
+    color: white;
+    border: none;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-right: 4px;
+}
+.btn-action-dark:hover {
+    background-color: #000;
+    color: white;
+}
+
+/* --- FICHA TÉCNICA ESTILOS --- */
+.ficha-data-label {
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+.ficha-data-value {
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #212529;
+}
+
+.unidad-image-container img {
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 12px;
+    /* Sombra suave si es la imagen de "Sin registro" */
+    filter: drop-shadow(0px 4px 8px rgba(0,0,0,0.1));
+}
+
+/* Barra de estado grande */
+.big-status-bar {
+    padding: 15px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+.big-status-bar.activa { background-color: var(--color-verde); }
+.big-status-bar.inactiva { background-color: var(--color-rojo); }
+
+.motivo-box {
+    background-color: #dc3545d4; /* Rojo con un poco de transparencia */
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+    border-left: 5px solid #a71d2a;
+}
+
+/* Sección Privada */
+.private-section-header {
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.private-title {
+    color: var(--color-secundario);
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.cerrar-sesion-link {
+    color: var(--color-rojo);
+    font-size: 0.9rem;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Botones de Acceso Directo (Grid) */
+.quick-access-btn {
+    background-color: #fff;
+    border: 1px solid #dee2e6;
+    color: #555;
+    font-weight: 600;
+    padding: 15px;
+    text-align: left;
+    border-radius: 10px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+}
+.quick-access-btn i {
+    color: var(--color-secundario);
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+.quick-access-btn:hover {
+    background-color: #f8f9fa;
+    border-color: var(--color-secundario);
+    color: var(--color-secundario);
+}

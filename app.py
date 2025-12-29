@@ -115,5 +115,46 @@ def create_tables():
     db.create_all()
     return "Tablas creadas en PostgreSQL"
 
+# --- AGREGAR AL FINAL DE app.py (Antes del __main__) ---
+
+# Ruta para ver el Taller
+@app.route('/taller')
+def taller():
+    unidad_id = request.args.get('id')
+    unidad = None
+    if unidad_id:
+        # Busca por ID o por Dominio (Patente)
+        unidad = Unidad.query.filter(
+            (Unidad.id == unidad_id) | (Unidad.dominio == unidad_id)
+        ).first()
+    return render_template('taller.html', unidad=unidad)
+
+# Ruta para procesar el cambio de estado (Solo funciona si viene con NFC)
+@app.route('/taller/cambiar_estado', methods=['POST'])
+def cambiar_estado():
+    unidad_id = request.form.get('unidad_id')
+    nuevo_estado = request.form.get('nuevo_estado')
+    justificacion = request.form.get('justificacion')
+    nfc_auth = request.form.get('nfc_autorizante')
+
+    # Validación de Seguridad Backend:
+    # Si alguien intenta enviar el form sin haber pasado por el modal NFC,
+    # el campo nfc_autorizante estará vacío.
+    if not nfc_auth:
+        flash('ERROR DE SEGURIDAD: Se requiere validación física NFC.', 'error')
+        return redirect(url_for('taller', id=unidad_id))
+
+    unidad = Unidad.query.get(unidad_id)
+    if unidad:
+        unidad.estado = nuevo_estado
+        # Aquí podrías guardar la 'justificacion' en una tabla de historial de eventos
+        # Por ahora, actualizamos el estado y guardamos en DB
+        db.session.commit()
+        # Usamos flash (necesitas configurar secret_key) o un print simple
+        print(f"Estado actualizado por {nfc_auth}: {justificacion}")
+        
+    return redirect(url_for('taller', id=unidad_id))
+
 if __name__ == '__main__':
+
     app.run(debug=True)

@@ -1,40 +1,104 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="card shadow">
-    <div class="card-header varela-green">
-        <h4>Ficha Técnica: {{ u.marca }} {{ u.modelo }}</h4>
+<div class="content-card">
+    <div class="mb-4 pt-2">
+        <h2 class="page-title text-start" style="color: var(--color-principal);">FICHA TÉCNICA</h2>
+        <p class="page-subtitle text-start fw-bold" style="color: #212529;">
+            {{ u.id }} - {{ u.tipo }}
+        </p>
+        <hr>
     </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-4 text-center">
-                {% if u.foto_url %}
-                <img src="{{ u.foto_url }}" class="img-fluid rounded mb-3" alt="Foto Unidad">
-                {% else %}
-                <div class="alert alert-secondary">Sin Imagen</div>
-                {% endif %}
-                <h2 class="badge bg-dark fs-4">{{ u.dominio }}</h2>
+
+    <div class="row">
+        <div class="col-lg-7 pe-lg-5">
+            <div class="row mb-3">
+                <div class="col-md-4 ficha-data-label">MARCA/MODELO</div>
+                <div class="col-md-8 ficha-data-value text-uppercase">{{ u.marca }} {{ u.modelo }}</div>
             </div>
-            <div class="col-md-8">
-                <table class="table table-striped">
-                    <tr><th>ID Interno</th><td>{{ u.id }}</td></tr>
-                    <tr><th>Área</th><td>{{ u.area }}</td></tr>
-                    <tr><th>Estado</th><td>
-                        <span class="badge {% if u.estado=='ACTIVA' %}bg-success{% else %}bg-danger{% endif %}">
-                            {{ u.estado }}
-                        </span>
-                    </td></tr>
-                    
-                    {% for key, value in u.detalles_tecnicos.items() %}
-                        <tr>
-                            <th class="text-uppercase">{{ key }}</th>
-                            <td>{{ value }}</td>
-                        </tr>
-                    {% endfor %}
-                </table>
+            <div class="row mb-3">
+                <div class="col-md-4 ficha-data-label">DOMINIO</div>
+                <div class="col-md-8 ficha-data-value text-uppercase">{{ u.dominio }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 ficha-data-label">AÑO</div>
+                <div class="col-md-8 ficha-data-value">{{ u.anio }}</div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4 ficha-data-label">ÁREA</div>
+                <div class="col-md-8 ficha-data-value">{{ u.area }}</div>
+            </div>
+             <div class="row mb-3">
+                <div class="col-md-4 ficha-data-label">FECHA ALTA</div>
+                <div class="col-md-8 ficha-data-value">{{ u.fecha_alta }}</div>
+            </div>
+
+            {% for key, value in u.detalles_tecnicos.items() %}
+                 {% if key not in ['MOTOR', 'CHASIS', 'PATRIMONIO', 'CHOFER', 'LEGAJO', 'DNI', 'MOTIVO_INACTIVIDAD'] %}
+                <div class="row mb-3">
+                    <div class="col-md-4 ficha-data-label">{{ key }}</div>
+                    <div class="col-md-8 ficha-data-value">{{ value }}</div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="col-lg-5 text-center unidad-image-container">
+            {% if u.foto_url %}
+                <img src="{{ u.foto_url }}" alt="Foto Unidad" class="img-fluid">
+            {% else %}
+                <img src="{{ url_for('static', filename='Sin-dato-de-imagen.png') }}" alt="Sin imagen" class="img-fluid bg-light p-4">
+            {% endif %}
+
+            {% if u.estado == 'ACTIVA' %}
+                <div class="big-status-bar activa">ACTIVA</div>
+            {% else %}
+                <div class="big-status-bar inactiva">{{ u.estado }}</div>
+                <div class="motivo-box text-start">
+                    <strong>Motivo de Inactividad</strong><br>
+                    - {{ u.detalles_tecnicos.get('MOTIVO_INACTIVIDAD', 'Verifique en Taller el diagnóstico detallado.') }}
+                </div>
+            {% endif %}
+        </div>
+    </div> <div class="private-section-header">
+        <span class="private-title"><i class="fas fa-lock me-2"></i> DATOS PRIVADOS Y GESTIÓN</span>
+        <span class="cerrar-sesion-link">Cerrar Sesión X</span>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7 pe-lg-5 mb-4">
+             <div class="row mb-2"><div class="col-md-4 ficha-data-label">CHASIS</div><div class="col-md-8 fw-bold">{{ u.chasis }}</div></div>
+            <div class="row mb-2"><div class="col-md-4 ficha-data-label">MOTOR</div><div class="col-md-8 fw-bold">{{ u.motor }}</div></div>
+            <div class="row mb-2"><div class="col-md-4 ficha-data-label">PATRIMONIO</div><div class="col-md-8 fw-bold">{{ u.patrimonio }}</div></div>
+            <div class="row mb-2"><div class="col-md-4 ficha-data-label">CHOFER</div><div class="col-md-8 fw-bold text-uppercase">{{ u.chofer }}</div></div>
+             <div class="row mb-2"><div class="col-md-4 ficha-data-label">LEGAJO / DNI</div><div class="col-md-8 fw-bold">{{ u.legajo }} / {{ u.dni }}</div></div>
+        </div>
+
+        <div class="col-lg-5">
+            <h6 class="text-muted mb-3">ACCESOS DIRECTOS:</h6>
+            <div class="row g-3">
+                <div class="col-6">
+                    <button class="btn quick-access-btn w-100">
+                        <i class="fas fa-road"></i> Control de Ingresos
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn quick-access-btn w-100">
+                        <i class="fas fa-wrench"></i> Historial de Reparaciones
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn quick-access-btn w-100">
+                        <i class="fas fa-calendar-alt"></i> Cronograma Mant.
+                    </button>
+                </div>
+                <div class="col-6">
+                    <button class="btn quick-access-btn w-100">
+                        <i class="fas fa-history"></i> Datos Históricos
+                    </button>
+                </div>
             </div>
         </div>
-        <a href="/dashboard" class="btn btn-secondary mt-3">Volver al Dashboard</a>
     </div>
 </div>
 {% endblock %}

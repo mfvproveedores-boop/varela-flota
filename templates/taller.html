@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2 class="text-uppercase border-bottom pb-2">🛠️ Gestión de Taller</h2>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form action="/taller" method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label for="buscar_id" class="col-form-label fw-bold">Buscar Unidad:</label>
+            </div>
+            <div class="col-auto">
+                <input type="text" name="id" id="buscar_id" class="form-control" placeholder="Ingrese ID o Dominio" value="{{ request.args.get('id', '') }}">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if unidad %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">{{ unidad.marca }} {{ unidad.modelo }}</h5>
+                <small>{{ unidad.dominio }}</small>
+            </div>
+            <div class="card-body text-center">
+                {% if unidad.foto_url %}
+                    <img src="{{ unidad.foto_url }}" class="img-fluid rounded mb-3" style="max-height: 200px;">
+                {% endif %}
+                
+                <h4 class="mb-3">Estado Actual: 
+                    <span class="badge {% if unidad.estado=='ACTIVA' %}bg-success{% else %}bg-danger{% endif %}">
+                        {{ unidad.estado }}
+                    </span>
+                </h4>
+
+                <hr>
+
+                <form id="formEstado" action="/taller/cambiar_estado" method="post">
+                    <input type="hidden" name="unidad_id" value="{{ unidad.id }}">
+                    <input type="hidden" name="nfc_autorizante" id="nfc_autorizante">
+
+                    <div class="mb-3 text-start">
+                        <label class="form-label fw-bold">Nuevo Estado:</label>
+                        <select name="nuevo_estado" class="form-select" required>
+                            <option value="ACTIVA">🟢 ACTIVA (Operativa)</option>
+                            <option value="INACTIVA">🔴 INACTIVA (Fuera de Servicio)</option>
+                            <option value="TALLER">🔧 EN TALLER (Mantenimiento)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3 text-start">
+                        <label class="form-label">Justificación / Diagnóstico:</label>
+                        <textarea name="justificacion" class="form-control" rows="3" required placeholder="Describa el motivo del cambio..."></textarea>
+                    </div>
+
+                    <button type="button" class="btn btn-warning w-100 fw-bold" onclick="validarYEnviar()">
+                        🔒 AUTORIZAR CAMBIO (NFC)
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0">📋 Historial de Reparaciones</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Detalle</th>
+                                <th>Mecánico</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>29/12/2025</td>
+                                <td>Preventivo</td>
+                                <td>Cambio de Aceite y Filtros</td>
+                                <td>Taller Central</td>
+                            </tr>
+                            <tr>
+                                <td>15/11/2025</td>
+                                <td>Correctivo</td>
+                                <td>Reemplazo batería</td>
+                                <td>Ext. Bosch</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="alert alert-info mt-3">
+                    <small>💡 Para agregar una nueva reparación, utilice el formulario de "Registro de Mantenimiento" en el menú principal.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% elif request.args.get('id') %}
+    <div class="alert alert-warning">
+        No se encontró ninguna unidad con el ID o Dominio ingresado.
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function validarYEnviar() {
+        // Llamamos a la función global definida en base.html
+        solicitarValidacionNFC(function(datosNFC) {
+            // Esta función se ejecuta SOLO si el NFC es válido
+            
+            // 1. Inyectamos el ID de la llave en el formulario
+            document.getElementById('nfc_autorizante').value = datosNFC.id; // o datosNFC.msg
+            
+            // 2. Enviamos el formulario
+            document.getElementById('formEstado').submit();
+        });
+    }
+</script>
+{% endblock %}
